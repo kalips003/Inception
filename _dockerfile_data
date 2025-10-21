@@ -1,0 +1,209 @@
+FROM debian:bookworm-slim
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+CMD ["bash"]
+
+
+
+
+# Everything needed to reproduce a running system:
+# 1 Base OS — minimal filesystem (Alpine, Debian, etc.).
+# 2 Installed software — packages, libraries, tools your app needs.
+# 3 Configuration files — app configs, system configs.
+# 4 Environment variables — values your app reads at runtime.
+# 5 Startup command — what process runs first (CMD or ENTRYPOINT).
+# 6 Ports to expose — which container ports map to the host.
+# 7 Files to include — app code, static assets.
+
+# Dockerfile → docker build → Image → docker run → Container
+FROM
+    Convention: FROM <distribution>:<version-or-tag>
+    Specifies base image.
+    Must be first non-comment instruction.
+    Example: FROM debian:bookworm-slim → start from minimal Debian.
+        FROM alpine:3.20 / ubuntu:24.04
+
+RUN
+    Executes a command during build.
+    Changes are saved into a new image layer.
+    Example: RUN apt-get update && apt-get install -y curl
+
+COPY
+    Copies files from host into image filesystem.
+    Syntax: COPY <src> <dest>
+
+ADD
+    Like COPY but supports URLs and automatic extraction of archives.
+    Use COPY unless you need archive unpacking.
+
+WORKDIR
+    Sets the working directory for subsequent instructions and for container runtime.
+    Example: WORKDIR /app
+
+ENV
+    Sets environment variables inside the image.
+    Example: ENV DB_USER=myuser
+
+EXPOSE
+    Declares which ports the container listens on.
+    Does not publish the port; informs users and tools.
+
+CMD
+    Default command when container starts.
+    Can be overridden with docker run <image> <command>.
+    Example: CMD ["nginx", "-g", "daemon off;"]
+
+ENTRYPOINT
+    Sets the main executable that always runs in the container.
+    CMD arguments are appended if ENTRYPOINT is set.
+
+VOLUME
+    Declares mount points for persistent data.
+    Example: VOLUME /var/lib/mysql
+
+USER
+    Sets the user to run subsequent commands or container process.
+
+ARG
+    Build-time variable, accessible only during docker build.
+    Example: ARG VERSION=1.
+
+LABEL
+    Adds metadata to the image.
+    Example: LABEL maintainer="me@example.om"
+
+ONBUILD
+    Delays instruction execution until a child image is built from this one.
+
+STOPSIGNAL
+    Defines which signal stops the container (default: SIGTERM).
+
+
+# ======================================================================================================
+Main flags — grouped by command.
+
+docker build
+
+-t name:tag → assign name and optional tag to the image.
+-f path/Dockerfile → specify custom Dockerfile path.
+--no-cache → ignore previous layers; rebuild from scratch.
+--pull → always try to fetch newer base image.
+--build-arg KEY=val → pass build-time variables to ARG instructions.
+
+docker run
+
+-d → detached mode (run in background).
+-it → interactive + pseudo-TTY (useful for shells).
+--name NAME → assign a custom container name.
+-p HOST:CONTAINER → publish container port to host.
+-v host_path:container_path → mount a host directory or volume.
+--rm → auto-remove container when it exits.
+-e KEY=value → set environment variable inside container.
+--env-file file → load many env vars from file.
+--network netname → attach container to specific network.
+--restart=always → auto-restart if it crashes or on daemon reboot.
+--entrypoint CMD → override image’s default entrypoint.
+--user UID:GID → run process as given user.
+--cpus, --memory → limit resources.
+
+docker ps
+-a → show all containers, even stopped ones.
+
+docker images
+-a → show intermediate image layers.
+
+docker exec
+-it → interactive session in a running container.
+
+docker logs
+-f → follow log output live.
+
+Flags combine freely:
+docker run -d -p 8080:80 --name web nginx 
+> runs an nginx container in background, mapping host 8080 → container 80.
+
+
+# ======================================================================================================
+
+
+➜  Inception git:(main) ✗ docker --help
+Usage:  docker [OPTIONS] COMMAND
+
+A self-sufficient runtime for containers
+
+Common Commands:
+  run         Create and run a new container from an image
+  exec        Execute a command in a running container
+  ps          List containers
+  build       Build an image from a Dockerfile
+  bake        Build from a file
+  pull        Download an image from a registry
+  push        Upload an image to a registry
+  images      List images
+  login       Authenticate to a registry
+  logout      Log out from a registry
+  search      Search Docker Hub for images
+  version     Show the Docker version information
+  info        Display system-wide information
+
+Management Commands:
+  builder     Manage builds
+  buildx*     Docker Buildx
+  compose*    Docker Compose
+  container   Manage containers
+  context     Manage contexts
+  image       Manage images
+  manifest    Manage Docker image manifests and manifest lists
+  network     Manage networks
+  plugin      Manage plugins
+  system      Manage Docker
+  trust       Manage trust on Docker images
+  volume      Manage volumes
+
+Swarm Commands:
+  swarm       Manage Swarm
+
+Commands:
+  attach      Attach local standard input, output, and error streams to a running container
+  commit      Create a new image from a container's changes
+  cp          Copy files/folders between a container and the local filesystem
+  create      Create a new container
+  diff        Inspect changes to files or directories on a container's filesystem
+  events      Get real time events from the server
+  export      Export a container's filesystem as a tar archive
+  history     Show the history of an image
+  import      Import the contents from a tarball to create a filesystem image
+  inspect     Return low-level information on Docker objects
+  kill        Kill one or more running containers
+  load        Load an image from a tar archive or STDIN
+  logs        Fetch the logs of a container
+  pause       Pause all processes within one or more containers
+  port        List port mappings or a specific mapping for the container
+  rename      Rename a container
+  restart     Restart one or more containers
+  rm          Remove one or more containers
+  rmi         Remove one or more images
+  save        Save one or more images to a tar archive (streamed to STDOUT by default)
+  start       Start one or more stopped containers
+  stats       Display a live stream of container(s) resource usage statistics
+  stop        Stop one or more running containers
+  tag         Create a tag TARGET_IMAGE that refers to SOURCE_IMAGE
+  top         Display the running processes of a container
+  unpause     Unpause all processes within one or more containers
+  update      Update configuration of one or more containers
+  wait        Block until one or more containers stop, then print their exit codes
+
+Global Options:
+      --config string      Location of client config files (default "/home/agallon/.docker")
+  -c, --context string     Name of the context to use to connect to the daemon (overrides DOCKER_HOST env var and default context set
+                           with "docker context use")
+  -D, --debug              Enable debug mode
+  -H, --host string        Daemon socket to connect to
+  -l, --log-level string   Set the logging level ("debug", "info", "warn", "error", "fatal") (default "info")
+      --tls                Use TLS; implied by --tlsverify
+      --tlscacert string   Trust certs signed only by this CA (default "/home/agallon/.docker/ca.pem")
+      --tlscert string     Path to TLS certificate file (default "/home/agallon/.docker/cert.pem")
+      --tlskey string      Path to TLS key file (default "/home/agallon/.docker/key.pem")
+      --tlsverify          Use TLS and verify the remote
+  -v, --version            Print version information and quit
+
+Run 'docker COMMAND --help' for more information on a command.

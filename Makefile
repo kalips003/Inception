@@ -1,4 +1,4 @@
-NAME = Inception
+NAME = inception
 
 
 all: $(NAME)
@@ -20,9 +20,10 @@ all: $(NAME)
 ARGS2 = "8 9 * 9 - 9 - 9 - 4 - 1 +"
 ARGS = 2e3 2a 0 a -a 42 9876543210 2.0 2.0f 2.33 -inf ++inf nan inff
 ARG = 4 3 2 1 5 6 7
-a: $(NAME)
+a:
 	@$(call random_shmol_cat, "TESHTING: ... $(NAME)!", "Viva le Docker!!", $(CLS), )
-	-./$(NAME) $(ARG)
+	-docker build -t $(NAME) .; \
+	docker run -d --name $(NAME)_ctr $(NAME)
 
 
 HOW_MANY_NUM = 100
