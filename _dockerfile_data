@@ -3,6 +3,14 @@ RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 CMD ["bash"]
 
 
+# docer build -t my_app_name:version111 [where to build=] .
+# then: docker run image_name:img_version
+
+# docker rm 2198312412 (delete container ID)
+# (then) docker rmi 2198312412 (delete img ID)
+
+# docker exec -it (interactive terminal) ID (container ID not img)
+
 
 
 # Everything needed to reproduce a running system:
@@ -207,3 +215,67 @@ Global Options:
   -v, --version            Print version information and quit
 
 Run 'docker COMMAND --help' for more information on a command.
+
+# ======================================================================================================
+
+# docker-compose.yml
+
+version: "3.9"   # (optional, modern Compose often omits this)
+services:        # Each service = one container configuration
+  web:           # Service name
+    image: nginx:alpine    # OR: build: .
+    container_name: my_web # (optional, default = <project>_<service>_<index>)
+    build:                 # Build options if no prebuilt image
+      context: .           # Path to Dockerfile
+      dockerfile: Dockerfile.dev
+      args:                # Build-time args for Dockerfile
+        NODE_ENV: production
+    command: npm start     # Override CMD from image
+    entrypoint: ["bash", "-c", "echo hello && nginx -g 'daemon off;'"]
+    environment:           # Environment variables
+      - DEBUG=false
+      - PORT=8080
+      DB_USER: root        # Two YAML syntaxes are allowed
+    env_file: .env         # Load vars from file
+    ports:                 # Host:Container port mapping
+      - "8080:80"
+    expose:                # Expose only to other containers (not host)
+      - "80"
+    volumes:               # Persistent data or host bind-mounts
+      - ./src:/app
+      - app_data:/var/lib/app
+    depends_on:            # Define startup order
+      - db
+    restart: unless-stopped  # no | always | on-failure | unless-stopped
+    networks:              # Which networks the service joins
+      - frontnet
+      - backnet
+    healthcheck:           # Define how Compose checks if it's "healthy"
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+    deploy:                # Mostly for Swarm (advanced)
+      replicas: 2
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 512M
+
+  db:                      # Another service
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - backnet
+
+volumes:                   # Define named volumes
+  app_data:
+  db_data:
+
+networks:                  # Define custom networks
+  frontnet:
+  backnet:
