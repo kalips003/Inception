@@ -1,0 +1,26 @@
+FROM debian:bookworm-slim
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+CMD ["bash"]
+
+
+# docer build -t my_app_name:version111 [where to build=] .
+# then: docker run image_name:img_version
+
+# docker rm 2198312412 (delete container ID)
+# (then) docker rmi 2198312412 (delete img ID)
+
+# docker exec -it (interactive terminal) ID (container ID not img)
+
+
+
+# Everything needed to reproduce a running system:
+# 1 Base OS — minimal filesystem (Alpine, Debian, etc.).
+# 2 Installed software — packages, libraries, tools your app needs.
+# 3 Configuration files — app configs, system configs.
+# 4 Environment variables — values your app reads at runtime.
+# 5 Startup command — what process runs first (CMD or ENTRYPOINT).
+# 6 Ports to expose — which container ports map to the host.
+# 7 Files to include — app code, static assets.
+
+# Dockerfile → docker build → Image → docker run → Container
+

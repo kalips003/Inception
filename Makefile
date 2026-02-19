@@ -17,68 +17,15 @@ all: $(NAME)
 # │─────██████─────██████████████─██████████████─────██████─────██████████─██████──────────██████─██████████████─│
 # ╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
 
-ARGS2 = "8 9 * 9 - 9 - 9 - 4 - 1 +"
-ARGS = 2e3 2a 0 a -a 42 9876543210 2.0 2.0f 2.33 -inf ++inf nan inff
-ARG = 4 3 2 1 5 6 7
 a:
 	@$(call random_shmol_cat, "TESHTING: ... $(NAME)!", "Viva le Docker!!", $(CLS), )
 	-docker build -t $(NAME) .; \
 	docker run -d --name $(NAME)_ctr $(NAME)
 
-
-HOW_MANY_NUM = 100
-MIN = 0
-MAX = 50000
-
-b: $(NAME)
-	@$(call random_shmol_cat, "TESHTING: ... $(NAME)!", "templates? temples to contemplate?", $(CLS), )
-	-@ARGS=$$(seq $(MIN) $(MAX) | shuf -n $(HOW_MANY_NUM) | tr '\n' ' ' | sed -r 's/ $$//'); \
-	./$(NAME) $$ARGS
-
-c: $(NAME)
-	-for num in $(ARGS); do \
-		$(call helper_tester, $$num, "testing aaall the numbers: $$num", "press enter to go next", ,) \
-	done
-
-v: $(NAME)
-	@$(call random_shmol_cat, "vlgrininnng ... $(NAME)!", "$(ARG2)", $(CLS), );
-	-$(VALGRIND) ./$(word 1, $^) $(ARG)
-
-# $(1)=$(ARGS) $(2)=$(TXT_cat) $(3)=$(TXT_below) $(4)=$(VALGRIND)(timeout 15s)
-define helper_tester
-	$(call random_shmol_cat, $(2), $(1), $(CLS), ); \
-	echo "\n\t$(3)\n"; \
-	$(4) ./$(word 1, $^) $(1); \
-	echo "\n\t$(C_421)~ Press Enter to continue...$(RESET)"; read -p "" key;
-endef
-
-# CREATE THE CLASS
-TEMPLATE_PATH = "../../TEST/_template"
-NEW_CLASS = MutanStack
-
-new: 
-	@$(call random_shmol_cat, "Classes created for: ~", "$(NEW_CLASS)", $(CLS), );
-	@if [ ! -e src ]; then \
-		mkdir -p src; \
-	fi
-	@for class in $(NEW_CLASS); do \
-		cpp_file=src/$$class.cpp; \
-		hpp_file=src/$$class.hpp; \
-		if [ ! -e $$cpp_file ]; then \
-			cp $(TEMPLATE_PATH)/_.cpp $$cpp_file; \
-			sed -i "s/Default/$$class/g" ./$$cpp_file; \
-		else \
-			printf "$(C_410) Skipping $(RESET)$$cpp_file$(C_410) : file already exists.$(RESET)\n"; \
-		fi; \
-		if [ ! -e $$hpp_file ]; then \
-			cp $(TEMPLATE_PATH)/_.hpp ./$$hpp_file; \
-			sed -i "s/Default/$$class/g" $$hpp_file; \
-			upper=$$(echo $$class | tr 'a-z' 'A-Z'); \
-			sed -i "s/DEFAULT_HPP/$${upper}_HPP/g" $$hpp_file; \
-		else \
-			printf "$(C_410) Skipping $(RESET)$$hpp_file$(C_410) : file already exists.$(RESET)\n"; \
-		fi; \
-	done
+NAME2 = appA:latest
+t:
+	@$(call random_shmol_cat, "TESHTING: ... $(NAME)!", "Viva le Docker!!", $(CLS), )
+	docker build -t $(NAME2) .
 
 
 # ╭──────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
