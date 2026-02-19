@@ -44,20 +44,40 @@ t:
 
 CC = g++
 FLAGS = -Wextra -Wall -Werror -g -std=c++98
+# FLAGS = -Wextra -Wall -Werror -g -std=c++98 -fno-elide-constructors
+FLAGS_LESS = -g -std=c++98
 
-SRC = $(wildcard src/*.cpp)
-OBJ = $(patsubst src/%.cpp, obj/%.o, $(SRC))
-HEAD = $(patsubst %.cpp, %.hpp, $(SRC))
+# beeing cleaned
+OBJ_FOLDER0 = _obj
+OBJ_FOLDER = src/$(OBJ_FOLDER0)
 
-ADD_FLAGS = -I$(INCLUDE)
-INC = -Isrc -Ilib
+SRC := $(shell find src -name '*.cpp')
+OBJ := $(SRC:src/%.cpp=src/$(OBJ_FOLDER0)/%.o)
+HEAD = $(shell find src -name '*.hpp') $(shell find inc -name '*.hpp')
 
-OBJ_FOLDER = obj
-SRC2 = Animal.cpp Dog.cpp Cat.cpp Brain.cpp
-HEAD2 = Animal.hpp Dog.hpp Cat.hpp Brain.hpp
-OBJ2 = $(patsubst %.cpp, obj/%.o, $(SRC2))
+FOLDERS_HEADERS := $(wildcard src/*/ src/*/*/ src/*/*/*/)
+FOLDERS_INCLUDE := $(addprefix -I, $(FOLDERS_HEADERS))
 
-SFML = -lsfml-graphics -lsfml-window -lsfml-system
+# -Iinc = -IncludeHeaders here: inc
+SFML_HEADER = lib/sfml/SFML
+SFML_IH = -I$(SFML_HEADER)
+INC = -Iinc -Isrc $(FOLDERS_INCLUDE)
+# -Llib = -L: where to find .so .a: lib
+SFML_LIB = -Llib/sfml
+# -lXXX = link libXXX.so or libXXX.a
+SFML_LINK = -lsfml-graphics -lsfml-window -lsfml-system
+
+# LIBDIR   := $(CURDIR)/lib
+# INC_DIR  := $(CURDIR)/sfml
+# -rpath,/custom/lib => -rpath tells the linker to embed a runtime library search path into the binary
+SFML_PATH =
+# SFML_PATH += -Wl,-rpath,'$$ORIGIN/lib'
+
+SFML = $(SFML_LINK)
+
+#  $(MORE_FLAGS)
+MORE_FLAGS = $(INC)
+# SFML library
 
 # ╭──────────────────────────────────────────────────────────────────────╮
 # │                  	 	       PROJECT                   	         │
@@ -65,23 +85,74 @@ SFML = -lsfml-graphics -lsfml-window -lsfml-system
 
 $(NAME): $(OBJ) main.cpp $(HEAD)
 	@clear
-	@if ! $(CC) $(FLAGS) $(OBJ) main.cpp -o $(NAME); then \
+	@if ! $(CC) $(FLAGS) $(INC) $(OBJ) main.cpp -o $(NAME); then \
 		$(call print_cat, "", $(RED), $(GOLD), $(RED_L), $(call pad_word, 10, "ERROR"), $(call pad_word, 12, "COMPILING..")); \
 		exit 1; \
 	fi
 	@$(call print_cat, $(CLEAR), $(GOLD), $(GREEN1), $(GREEN1), $(call pad_word, 10, $(NAME)), $(call pad_word, 12, "Compiled~"));
 
 abc: clean_silent $(OBJ) main.cpp $(HEAD)
-	$(CC) $(FLAGS) main.cpp $(OBJ) -o $(NAME)
+	$(CC) $(FLAGS) $(INC) $(OBJ) main.cpp -o $(NAME)
 
-obj/%.o: src/%.cpp src/%.hpp
-	@if [ ! -e $(OBJ_FOLDER) ]; then\
-		mkdir -p $(OBJ_FOLDER);\
-	fi
+src/$(OBJ_FOLDER0)/%.o: src/%.cpp src/class/Log/Log.hpp
+	@mkdir -p $(dir $@)
 	@if ! $(CC) -c $(FLAGS) $(INC) $< -o $@; then \
 		$(call shmol_cat_error, $(RED), $(RED_L)); \
 		exit 1; \
 	fi
+
+# ╭──────────────────────────────────────────────────────────────────────╮
+# │                  	 	       MAKE TEST                   	         │
+# ╰──────────────────────────────────────────────────────────────────────╯
+
+TEST_FOLDER = data
+TEST_MAIN = $(TEST_FOLDER)/main_test.cpp
+TEST_PATH_FILE = src/class/HTTP_request/
+FILES_TEST = $(TEST_PATH_FILE)HttpRequest.cpp \
+	src/kali/_A.cpp \
+	$(wildcard src/Tools/*.cpp) $(wildcard src/vocabulary/*.cpp)
+
+test: $(TEST_MAIN)
+	@rm -f $(TEST_FOLDER)/a.out
+	@clear
+	-@$(CC) $(FLAGS_LESS) $(INC) $(FILES_TEST) $(TEST_MAIN) -o $(TEST_FOLDER)/a.out
+	@if [ ! -e $(TEST_FOLDER)/a.out ]; then\
+		$(call print_cat, "", $(RED), $(GOLD), $(RED_L), $(call pad_word, 10, "The⠀Cake"), $(call pad_word, 12, "Is⠀A⠀Lie..")); \
+		exit 3; \
+	fi
+	@$(call random_cat, $(call pad_word, 12, "Making"), $(call pad_word, 14, "Science"), $(CLS), $(RESET));
+	@$(TEST_FOLDER)/a.out
+
+# test%:	libft $(OBJ) inc/$(NAME).h
+# 	@rm -f ./TEST/a.out
+# 	@$(CC) $(FLAGS_TEST) $(OBJ) ./lib/test.c lib/libft.a $(ADD_FLAGS) -o ./lib/a.out
+# 	@$(call random_cat, $(call pad_word, 12, "TESTING"), $(call pad_word, 14, "SCIENCE"), $(CLS), $(RESET));
+# 	-@$(VALGRIND) lib/a.out
+
+INPUT_FILE = data/config_file.conf
+test2: $(OBJ) $(TEST_MAIN) $(HEAD)
+	@rm -f $(TEST_FOLDER)/a.out
+	@clear
+	@$(CC) $(FLAGS_TEST) $(INC) $(OBJ) $(TEST_MAIN) -o $(TEST_FOLDER)/a.out
+	@$(call random_cat, $(call pad_word, 12, "TESTING"), $(call pad_word, 14, "SCIENCE"), $(CLS), $(RESET));
+	@$(TEST_FOLDER)/a.out $(INPUT_FILE)
+
+# f_d=$${rule:0:1}; s_d=$${rule:1:1};
+# %:
+# 	@rule=$@; \
+# 	if echo $$rule | grep -qE '^[0-9]$$'; then \
+# 		s_d=$$rule; \
+# 		$(call random_shmol_cat, "teshting ... CPP 8: exo $$s_d", 'hav fun ね?', $(CLS), ); \
+# 		make -C ex0$$s_d a; \
+# 	elif echo $$rule | grep -qE '^[0-9][a-z]$$'; then \
+# 		s_d=$$(echo $$rule | cut -c1); \
+# 		s_a=$$(echo $$rule | cut -c2); \
+# 		$(call random_shmol_cat, "Valgrinning ... CPP 8: exo $$s_d", 'hav fun ね?', $(CLS), ); \
+# 		make -C ex0$$s_d $$s_a; \
+# 	else \
+# 		$(call random_shmol_cat, "Error! $@ isnt a valable exo", 'Bad Miaou', $(CLS), ); \
+# 		exit 1; \
+# 	fi
 
 # ╭────────────────────────────────────────────────────────────────────────────╮
 # │─██████████████─██████████████─██████████████─██████─────────██████████████─│
@@ -105,13 +176,15 @@ V_FLAG = --suppressions="ignore_valgrind"
 HELLGRIND = valgrind --tool=helgrind ?-g3?
 
 # ↑さ↓ぎょう  を  ↓ほ↑ぞん
+# Default git push
 git: fclean
 	@$(call random_shmol_cat_blink, 作業を保存してるかな.., いいね、いいねえー , $(CLS), );
 	@current_date=$$(date); \
 	git add .; \
-	git commit -m "$$current_date"; \
+	git commit -m "^^._, work in progress, small changes"; \
 	git push
 
+# Git Push that asks for commit msg
 git2: fclean
 	@$(call random_shmol_cat_blink, 作業を保存してるかな.., いいね、いいねえー , $(CLS), );
 	@read -p "Enter commit message: " msg; \
@@ -119,6 +192,22 @@ git2: fclean
 	git add .; \
 	git commit -m "$$msg"; \
 	git push
+
+# Git Push use the content of .gitmsg to push
+# if .gitmsg empty, return error
+# clear .gitmsg on succesfull push.
+GIT_MSG_FILE = data/.gitmsg
+git3: fclean
+	@$(call random_shmol_cat_blink, 作業を保存してるかな.., いいね、いいねえー , $(CLS), );
+	@{ \
+		msg="$$(cat $(GIT_MSG_FILE) 2>/dev/null)"; \
+		[ -z "$$msg" ] && { $(call random_shmol_cat_blink, error, file is empty, , ); exit 1; }; \
+		git add . && \
+		git commit -m "$$msg" && \
+		git push && \
+		: > $(GIT_MSG_FILE) && \
+		$(call random_shmol_cat_blink, success!, $(GIT_MSG_FILE) cleared., , ); \
+	}
 
 # --------------------------------------------------------------------------------- >
 # 																				CLEAN
