@@ -1,0 +1,33 @@
+
+version: "3.9"
+
+services:
+# docker build -t nginx -f ./requirements/nginx/Dockerfile
+# docker run --name nginx -p 1234:443 --restart=always -env-file /path/to/env.txt --network this_network -v not needed?
+  nginx:
+    container_name: nginx
+    build: ./requirements/nginx
+    image: nginx
+    ports:
+      - "443:443"
+      - "80:80"
+    restart: always
+    networks: 
+      - inception
+    env_file:
+      - /path/to/env.txt (or .env)
+    environment:
+      - VARIABLE=${VARIABLE}
+
+# docker network create <project>_<networkname>
+# docker network connect nginx inception
+networks:
+  inception:
+    name: inception
+    driver: bridge
+
+# docker volume create myvolume
+volumes:
+  myvolume:
+    name: inception
+    dreiver: local

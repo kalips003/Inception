@@ -1,13 +1,27 @@
-
 # ======================================================================================================
+# Docker Compose File Reference
+
 
 # docker-compose.yml
+# ======================================================================================================
 
 version: "3.9"   # (optional, modern Compose often omits this)
+
+# -----------------------------------------
+# SERVICES SECTION
+# -----------------------------------------
 services:        # Each service = one container configuration
-  web:           # Service name
+
+# -----------------------------------------
+# Service name, internal DNS resolution: curl http://nginx > nginx → container IP
+# How other containers refer to it, depends_on references, Default container naming
+  abc:
+  # docker run --name nginx (if not defined, default to <project>-abc-1 = <project>_<service>_<index>)
+  # actual container name (What you see in docker ps, docker exec -it abcd bash, d. logs abcd, d. stop abcd...)
+    container_name: abcd
+
+  # if no build: 
     image: nginx:alpine    # OR: build: .
-    container_name: my_web # (optional, default = <project>_<service>_<index>)
     build:                 # Build options if no prebuilt image
       context: .           # Path to Dockerfile
       dockerfile: Dockerfile.dev
@@ -15,13 +29,19 @@ services:        # Each service = one container configuration
         NODE_ENV: production
     command: npm start     # Override CMD from image
     entrypoint: ["bash", "-c", "echo hello && nginx -g 'daemon off;'"]
+  # docker run -e KEY=value
     environment:           # Environment variables
       - DEBUG=false
       - PORT=8080
-      DB_USER: root        # Two YAML syntaxes are allowed
+    environment:
+      DB_USER: root        # other syntax
+      OTHER_VAR: abc
+  # docker run --env-file .env
     env_file: .env         # Load vars from file
+  # docker run -p HOST:CONTAINER
     ports:                 # Host:Container port mapping
       - "8080:80"
+  # docker run --expose 80
     expose:                # Expose only to other containers (not host)
       - "80"
     volumes:               # Persistent data or host bind-mounts
@@ -29,6 +49,7 @@ services:        # Each service = one container configuration
       - app_data:/var/lib/app
     depends_on:            # Define startup order
       - db
+  # docker run --restart=...
     restart: unless-stopped  # no | always | on-failure | unless-stopped
     networks:              # Which networks the service joins
       - frontnet
@@ -46,6 +67,7 @@ services:        # Each service = one container configuration
           cpus: "0.5"
           memory: 512M
 
+# -----------------------------------------
   db:                      # Another service
     image: mysql:8
     environment:
@@ -55,10 +77,31 @@ services:        # Each service = one container configuration
     networks:
       - backnet
 
-volumes:                   # Define named volumes
-  app_data:
-  db_data:
+# -----------------------------------------
+# NETWORKS SECTION
+# -----------------------------------------
+# Equivalent to: docker network create
+networks:
+  inception:
+    driver: bridge               # docker network create --driver bridge
+    # name: inception            # Force exact name (no project prefix)
+    # external: true             # Use already-existing network
 
-networks:                  # Define custom networks
-  frontnet:
-  backnet:
+
+# -----------------------------------------
+# VOLUMES SECTION
+# -----------------------------------------
+# Equivalent to: docker volume create
+volumes:
+  myvolume:
+    driver: local                # docker volume create --driver local
+    
+  db_data:
+    driver: local
+    
+    # Bind mount example:
+    # driver_opts:
+    #   type: none
+    #   o: bind
+    #   device: /home/user/data/db
+

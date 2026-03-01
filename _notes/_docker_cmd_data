@@ -5,6 +5,11 @@ CMD ["bash"] -->
 # ======================================================================================================
 Main flags — grouped by command.
 
+<!-- 
+	docker build <arg> ./folder/context
+	-t image1:0.1
+	-f /path/to/dockerfile
+-->
 docker build <build context>
 
 # <build context>
@@ -18,6 +23,19 @@ docker build <build context>
 --pull → always try to fetch newer base image.
 --build-arg KEY=val → pass build-time variables to ARG instructions.
 
+<!-- 
+	docker run
+		-d
+		-it
+		--name mycontainer1
+		-p 8080:80
+		-v /host_path:/container_path
+		-rm
+		-e MYVAR=abc
+		--env-file /file_for_env
+		--network mynetwork1
+		--restart=always	
+-->
 docker run
 
 -d → detached mode (run in background).
@@ -29,13 +47,15 @@ docker run
 --name NAME → assign a custom container name.
 # docker run -p 8080:80 -p 8443:443 nginx (forward host > container)
 -p HOST:CONTAINER → publish container port to host.
-# docker run -it -v /home/kali/data:/app/data ubuntu bash
+# docker run -it -v /home/kali/data:/app/data ubuntu bash / -v $(pwd):/app
 -v host_path:container_path → mount a host directory or volume.
-# remove it from docker ps list (otherwise, its stays with status exited)
+# remove it from docker ps list (otherwise, its stays with status exited, and can be restarted)
 --rm → auto-remove container when it exits.
 -e KEY=value → set environment variable inside container.
+# docker run --env-file .env myapp (DB_HOST=localhost\n DB_HOST=localhost DEBUG=true)
 --env-file file → load many env vars from file.
 --network netname → attach container to specific network.
+# --restart=no (default) --restart=on-failure:5
 --restart=always → auto-restart if it crashes or on daemon reboot.
 --entrypoint CMD → override image’s default entrypoint.
 --user UID:GID → run process as given user.
@@ -48,6 +68,7 @@ docker images
 -a → show intermediate image layers.
 
 docker exec
+# docker exec -it app2 sh
 -it → interactive session in a running container.
 
 docker logs
@@ -84,12 +105,27 @@ Management Commands:
   builder     Manage builds
   buildx*     Docker Buildx
   compose*    Docker Compose
+  <!-- 
+	-f /path/to/compose.yml
+	-p projectname
+	-d detached
+  -->
+  # alias: docker container stop abc == docker stop abc
   container   Manage containers
   context     Manage contexts
   image       Manage images
   manifest    Manage Docker image manifests and manifest lists
 # docker network create mynet
   network     Manage networks
+<!-- 
+  connect     Connect a container to a network
+  create      Create a network
+  disconnect  Disconnect a container from a network
+  inspect     Display detailed information on one or more networks
+  ls          List networks
+  prune       Remove all unused networks
+  rm          Remove one or more networks
+ -->
   plugin      Manage plugins
   system      Manage Docker
   trust       Manage trust on Docker images
