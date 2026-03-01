@@ -10,18 +10,31 @@ Main flags — grouped by command.
 	-t image1:0.1
 	-f /path/to/dockerfile
 -->
-docker build <build context>
+docker build <args> <build context>
+docker build
+    -t name:tag (--tag)
+    -f path/to/Dockerfile (--file)
+    --no-cache → ignore previous layers; rebuild from scratch (doesnt reuse cached layers)
+    --pull → always try to fetch newer base image.
+    --cache-from
+    --cache-to
+    --build-arg KEY=val → pass build-time variables to ARG instructions.
+    --platform linux/amd64
+    --target builder → (FROM debian:bookworm AS builder)
+    (modern)
+    --secret
+    --ssh
+    --progress=plain
+    -o --output type=tar,dest=image.tar
+    --label version=1.0
+    --squash
+    --network
+    --build-context
+    --memory
+    --cpus
+  /path/to/context
 
-# <build context>
-. folder and sub folders to give automaticaly to 
--t name:tag → assign name and optional tag to the image.
-# -f docker/Dockerfile.dev
--f path/Dockerfile → specify custom Dockerfile path.
-# btween 2 builds, doesnt reuse cached layers
---no-cache → ignore previous layers; rebuild from scratch.
 # doesnt use local os images copy (fetch newer ones)
---pull → always try to fetch newer base image.
---build-arg KEY=val → pass build-time variables to ARG instructions.
 
 <!-- 
 	docker run
@@ -30,13 +43,13 @@ docker build <build context>
 		--name mycontainer1
 		-p 8080:80
 		-v /host_path:/container_path
-		-rm
+		--rm
 		-e MYVAR=abc
 		--env-file /file_for_env
 		--network mynetwork1
 		--restart=always	
 -->
-docker run
+docker run <args> <img to run>
 
 -d → detached mode (run in background).
 # -i → keep STDIN open (interactive)
@@ -86,7 +99,7 @@ Usage:  docker [OPTIONS] COMMAND
 
 A self-sufficient runtime for containers
 
-Common Commands:
+docker:
   run         Create and run a new container from an image
   exec        Execute a command in a running container
   ps          List containers
@@ -100,6 +113,8 @@ Common Commands:
   search      Search Docker Hub for images
   version     Show the Docker version information
   info        Display system-wide information
+  rm <container>
+  rmi <image>
 
 Management Commands:
   builder     Manage builds

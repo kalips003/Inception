@@ -1,0 +1,117 @@
+# ===============================
+# Docker Compose File Reference
+# ===============================
+
+# Compose file format version
+# Not Docker version. Defines YAML schema/features.
+# No direct docker run equivalent.
+version: "3.9"
+
+services:
+  # -----------------------------
+  # SERVICE DEFINITION
+  # -----------------------------
+  nginx:                         # docker run <image>
+    
+    container_name: nginx        # docker run --name nginx
+    
+    build: ./requirements/nginx  # docker build -t nginx ./requirements/nginx
+                                  # If both image + build exist, build tags image name
+    
+    image: nginx:latest          # docker run nginx:latest
+    
+    restart: always              # docker run --restart=always
+    
+    ports:                       # docker run -p HOST:CONTAINER
+      - "80:80"
+      - "443:443"
+    
+    expose:                      # docker run --expose 8080
+      - "8080"                   # Only visible to other containers
+    
+    environment:                 # docker run -e KEY=value
+      - NGINX_HOST=localhost
+      - NGINX_PORT=80
+    
+    env_file:                    # docker run --env-file .env
+      - .env
+    
+    volumes:                     # docker run -v host:container
+      - ./conf:/etc/nginx/conf.d
+      - myvolume:/data
+    
+    networks:                    # docker run --network network_name
+      - inception
+    
+    depends_on:                  # No exact docker run equivalent
+      - db                       # Controls startup order only
+    
+    command: ["nginx", "-g", "daemon off;"]
+                                  # docker run nginx nginx -g "daemon off;"
+    
+    entrypoint: ["./entrypoint.sh"]
+                                  # docker run --entrypoint ./entrypoint.sh
+    
+    working_dir: /var/www        # docker run -w /var/www
+    
+    user: "1000:1000"            # docker run --user 1000:1000
+    
+    stdin_open: true             # docker run -i
+    tty: true                    # docker run -t
+    
+    privileged: true             # docker run --privileged
+    
+    cap_add:                     # docker run --cap-add
+      - NET_ADMIN
+    
+    cap_drop:                    # docker run --cap-drop
+      - MKNOD
+    
+    deploy:                      # Used mainly in Docker Swarm (not normal compose)
+      replicas: 1
+
+  # -----------------------------
+  # SECOND SERVICE EXAMPLE
+  # -----------------------------
+  db:
+    image: mariadb:latest
+    container_name: mariadb
+    restart: always
+    
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+    
+    volumes:
+      - db_data:/var/lib/mysql
+    
+    networks:
+      - inception
+
+
+# -----------------------------
+# NETWORKS SECTION
+# -----------------------------
+# Equivalent to: docker network create
+networks:
+  inception:
+    driver: bridge               # docker network create --driver bridge
+    # name: inception            # Force exact name (no project prefix)
+    # external: true             # Use already-existing network
+
+
+# -----------------------------
+# VOLUMES SECTION
+# -----------------------------
+# Equivalent to: docker volume create
+volumes:
+  myvolume:
+    driver: local                # docker volume create --driver local
+    
+  db_data:
+    driver: local
+    
+    # Bind mount example:
+    # driver_opts:
+    #   type: none
+    #   o: bind
+    #   device: /home/user/data/db

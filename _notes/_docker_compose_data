@@ -20,7 +20,8 @@ services:        # Each service = one container configuration
   # actual container name (What you see in docker ps, docker exec -it abcd bash, d. logs abcd, d. stop abcd...)
     container_name: abcd
 
-  # if no build: 
+  # if no build: image is pulled
+  # if build, give the built image its name?
     image: nginx:alpine    # OR: build: .
     build:                 # Build options if no prebuilt image
       context: .           # Path to Dockerfile
