@@ -1,8 +1,26 @@
 
-version: "3.9"
-
 services:
-# docker build -t nginx -f ./requirements/nginx/Dockerfile
-# docker run --name nginx -p 1234:443 --restart=always -env-file /path/to/env.txt --network this_network -v not needed?
+# =========================================================
   nginx:
-    container_name: nginx
+    image: inception-nginx
+    build:
+      context: ./nginx
+    volumes:
+      - sharedvolume:/var/www/html
+    ports:
+      - "443:443"
+# =========================================================
+  wordpress:
+    image: inception-wordpress
+    build:
+      context: ./wordpress
+    volumes:
+      - sharedvolume:/var/www/html
+
+# =========================================================
+volumes:
+  sharedvolume:
+    driver: local
+
+# =========================================================
+# networks:

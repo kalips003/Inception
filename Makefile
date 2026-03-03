@@ -17,15 +17,25 @@ all: $(NAME)
 # │─────██████─────██████████████─██████████████─────██████─────██████████─██████──────────██████─██████████████─│
 # ╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
 
-a:
-	@$(call random_shmol_cat, "TESHTING: ... $(NAME)!", "Viva le Docker!!", $(CLS), )
-	-docker build -t $(NAME) .; \
-	docker run -d --name $(NAME)_ctr $(NAME)
 
-NAME2 = appA:latest
-t:
+# docker compose -p myproject up
+# docker compose up -d (background)
+# docker compose up --build (Rebuild images before starting)
+# docker compose up --remove-orphans
+# docker compose up --scale nginx=3
+# docker compose up --force-recreate
+# docker compose up --abort-on-container-exit
+a:
+	clear
 	@$(call random_shmol_cat, "TESHTING: ... $(NAME)!", "Viva le Docker!!", $(CLS), )
-	docker build -t $(NAME2) .
+	-docker compose -f srcs/docker-compose.yml -p $(NAME) up --build -d
+
+NAME2 = bash:1.0
+t:
+	clear
+	@$(call random_shmol_cat, "TESHTING: ... $(NAME)!", "Viva le Docker!!", $(CLS), )
+	docker build -t $(NAME2) -f folder/Dockerfile .
+	docker run -it --name bashtest $(NAME2)
 
 
 # ╭──────────────────────────────────────────────────────────────────────────────────────────────────────────────╮

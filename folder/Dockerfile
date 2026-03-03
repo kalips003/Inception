@@ -1,4 +1,4 @@
 # BASH CONTAINER
-FROM debian:stable-slim
+FROM debian:bullseye
 
 CMD ["bash"]
