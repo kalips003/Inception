@@ -42,6 +42,7 @@ services:        # Each service = one container configuration
   # docker run -p HOST:CONTAINER
     ports:                 # Host:Container port mapping
       - "8080:80"
+      - "4241:443"
   # docker run --expose 80
     expose:                # Expose only to other containers (not host)
       - "80"
@@ -61,22 +62,29 @@ services:        # Each service = one container configuration
       timeout: 10s
       retries: 3
       start_period: 5s
+  # Used mainly in Docker Swarm (not normal compose)
     deploy:                # Mostly for Swarm (advanced)
       replicas: 2
       resources:
         limits:
           cpus: "0.5"
           memory: 512M
-
-# -----------------------------------------
-  db:                      # Another service
-    image: mysql:8
-    environment:
-      MYSQL_ROOT_PASSWORD: example
-    volumes:
-      - db_data:/var/lib/mysql
-    networks:
-      - backnet
+  # docker run -w /var/www
+    working_dir: /var/www
+  # docker run --user 1000:1000
+    user: "1000:1000"
+  # docker run -i
+    stdin_open: true
+  # docker run -t
+    tty: true
+  # docker run --privileged
+    privileged: true
+  # docker run --cap-add
+    cap_add:
+      - NET_ADMIN
+  # docker run --cap-drop
+    cap_drop:
+      - MKNOD
 
 # -----------------------------------------
 # NETWORKS SECTION
@@ -105,4 +113,3 @@ volumes:
     #   type: none
     #   o: bind
     #   device: /home/user/data/db
-

@@ -1,0 +1,61 @@
+dev # Device files # Special pseudo-files representing hardware or kernel interfaces. (/dev/tty, /dev/null)
+  # null (r= EOF, w= discarded)
+  # zero (r= zeros, w= discarded)
+  # full (r= EOF, w= ENOSPC)
+  # random
+  # urandom
+# UNIQUE PER PROCESS
+  # fd -> /proc/self/fd
+  # stdin -> /proc/self/fd/0
+  # stdout -> /proc/self/fd/1
+  # stderr -> /proc/self/fd/2
+  # pts -Directory containing pseudo-terminals. (pts/0, ...)
+  # tty -The controlling terminal of the current process.
+# GLOBAL
+  # console
+  # shm # Shared Memory #
+  # mqueue -Interprocess message exchange (mq_open, mq_send, mq_receive)
+  # core -> /proc/kcore -This represents kernel memory in ELF format.
+  # ptmx -> pts/ptmx -Master PTY multiplexer, allocates pseudo-terminals
+  # /dev/sd* > sda, sdb, ... (first, second .. disk detected), sda1, sda2, .. (First partition, 2nd, ..)
+
+boot # Bootloader files #
+etc # System configuration #
+  # /etc/nginx/, /etc/network/, /etc/hostname ...
+home # user homes directories #
+root # Home directory for root user # == /home/root
+
+usr # Userland programs and data # Pretty much everything
+# all thoses live in /usr
+bin # Binaries #
+sbin # System binaries #
+lib # shared libraries
+lib64
+  # /usr/share -man pages, documentation, icons...
+  # /usr/include -Header files for compiling (stdio.h ..)
+  # /usr/local
+
+var # Variable data # -Files that change during runtime
+  # /var/log
+  # /var/www -web content
+  # /var/lib -application data
+  # /var/run -runtime pid files -> /run
+  # /var/tmp -Temporary files that survive reboot
+  # /var/cache
+run # -runtime pid files / data
+tmp # Temporary files -cleared on reboot
+
+proc # Process & kernel virtual filesystem # -all PID (folder num pid) + sysinfo # /proc/self/fd
+sys # Kernel + hardware interface virtual filesystem (system info)
+  # /sys/block -Block devices (disks, partitions)
+  # /sys/bus -Buses (PCI, USB) and devices attached to them
+  # /sys/class -Device classes (network, input, etc.)
+  # /sys/devices -Physical devices in the system
+  # /sys/kernel -Kernel objects exposed to userspace
+  # /sys/module -Loaded kernel modules
+  # /sys/fs -Filesystem-related info (e.g., cgroups)
+
+mnt # Temporary mount point # -Used for manually mounted filesystems.
+media # Mount point # -(removable media (CDs, USBs, etc.))
+opt # Optional software # -Used for manually installed third-party software (/opt/google/)
+srv # Service Data # -/srv/www (hold data for services provided by the system)

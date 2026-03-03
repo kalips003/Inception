@@ -1,3 +1,9 @@
+# Nginx binary (installed via apt)
+# A valid configuration file
+# A listening port
+# Foreground execution (daemon off)
+# (Inception) SSL certificate
+
 FROM debian:bullseye
 
 RUN apt update && \
