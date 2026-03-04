@@ -30,6 +30,15 @@ a:
 	@$(call random_shmol_cat, "TESHTING: ... $(NAME)!", "Viva le Docker!!", $(CLS), )
 	-docker compose -f srcs/docker-compose.yml -p $(NAME) up --build -d
 
+down : 
+	docker-compose -f ./srcs/docker-compose.yml down -v
+
+stop : 
+	docker-compose -f ./srcs/docker-compose.yml stop
+
+start : 
+	docker-compose -f ./srcs/docker-compose.yml start
+
 NAME2 = bash:1.0
 t:
 	clear
@@ -221,7 +230,7 @@ git3: fclean
 
 # --------------------------------------------------------------------------------- >
 # 																				CLEAN
-clean:
+clean: down
 	@rm -rf $(OBJ_FOLDER)
 	@$(call print_cat, $(CLEAR), $(C_225), $(C_320), $(C_450), $(call pad_word, 10, "Objects"), $(call pad_word, 12, "Exterminated"));
 

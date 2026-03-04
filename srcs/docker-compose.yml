@@ -1,28 +1,91 @@
-
+# =========================================================
 services:
-# =========================================================
+# ---------------------------------------------------------
   nginx:
-    image: inception-nginx
+    container_name: nginx
+    image: nginx:inception
     build:
-      context: ./nginx
-    volumes:
-      - sharedvolume:/var/www/html
+      context: ./requirements/nginx/.
     ports:
-      - "443:443"
-# =========================================================
-  wordpress:
-    image: inception-wordpress
-    build:
-      context: ./wordpress
+     - "443:443"
+    depends_on:
+      - wordpress
     volumes:
-      - sharedvolume:/var/www/html
+      - wordpress:/var/www/html
+    networks:
+      - inception
+    env_file:
+      - .env
+    restart: always
+  
+# ---------------------------------------------------------
+  wordpress:
+    container_name: wordpress
+    image: wordpress:inception
+    build:
+      context: ./requirements/wordpress/.
+    depends_on:
+      - mariadb
+    volumes:
+      - wordpress:/var/www/html
+    networks:
+      - inception
+    env_file:
+      - .env
+    restart: always
 
+# ---------------------------------------------------------
+  mariadb:
+    container_name: mariadb
+    image: mariadb:inception
+    build:
+      context: ./requirements/mariadb/.
+    volumes:
+      - mariadb:/var/lib/mysql
+    networks:
+      - inception
+    env_file:
+      - .env
+    restart: always
+
+
+
+
+
+#     secrets:
+#       - db_password
+
+# depends_on:
+#   mariadb:
+#     condition: service_healthy
+#   helthcheck:?
 # =========================================================
 volumes:
-  sharedvolume:
+  wordpress:
+    name: wordpress
     driver: local
-  wp_database:
+    driver_opts:
+      device:
+      o:
+      type:
+  mariadb:
+    name: mariadb
+    driver: local
+    driver_opts:
+      device:
+      o:
+      type:
+
 
 # =========================================================
-# networks:
+networks:
+  inception:
+    name: inception
+  
 
+# =========================================================
+secrets:
+  db_password:
+    file: ./secrets/db_password.txt
+  db_root_password:
+    file: ./secrets/db_root_password.txt
