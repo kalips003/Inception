@@ -21,6 +21,7 @@ services:
 volumes:
   sharedvolume:
     driver: local
+  wp_database:
 
 # =========================================================
 # networks:
