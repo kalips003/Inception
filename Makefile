@@ -230,7 +230,7 @@ git3: fclean
 
 # --------------------------------------------------------------------------------- >
 # 																				CLEAN
-clean: down
+clean:
 	@rm -rf $(OBJ_FOLDER)
 	@$(call print_cat, $(CLEAR), $(C_225), $(C_320), $(C_450), $(call pad_word, 10, "Objects"), $(call pad_word, 12, "Exterminated"));
 
