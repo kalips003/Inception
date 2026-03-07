@@ -16,7 +16,7 @@ services:
       - inception
     env_file:
       - .env
-    restart: always
+    restart: on-failure
   
 # ---------------------------------------------------------
   wordpress:
@@ -33,7 +33,10 @@ services:
       - inception
     env_file:
       - .env
-    restart: always
+    restart: on-failure
+    secrets:
+      - db_password
+      - wp_credentials
 
 # ---------------------------------------------------------
   mariadb:
@@ -47,12 +50,15 @@ services:
       - inception
     env_file:
       - .env
-    restart: always
+    restart: on-failure
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-u", "root", "-p$MYSQL_ROOT_PASSWORD"]
       interval: 5s
       timeout: 3s
       retries: 10
+    secrets:
+      - db_password
+      - db_root_password
 
 # =========================================================
 volumes:
@@ -74,3 +80,5 @@ secrets:
     file: ./secrets/db_password.txt
   db_root_password:
     file: ./secrets/db_root_password.txt
+  wp_credentials:
+    file: ./secrets/credentials.txt
