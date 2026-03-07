@@ -26,7 +26,6 @@ all: $(NAME)
 # docker compose up --force-recreate
 # docker compose up --abort-on-container-exit
 a:
-	clear
 	@$(call random_shmol_cat, "TESHTING: ... $(NAME)!", "Viva le Docker!!", $(CLS), )
 	-docker compose -f srcs/docker-compose.yml -p $(NAME) up --build -d
 
@@ -41,11 +40,34 @@ start :
 
 NAME2 = bash:1.0
 t:
-	clear
 	@$(call random_shmol_cat, "TESHTING: ... $(NAME)!", "Viva le Docker!!", $(CLS), )
 	docker build -t $(NAME2) -f folder/Dockerfile .
 	docker run -it --name bashtest $(NAME2)
 
+maria:
+	@$(call random_shmol_cat, "TESHTING: ... MARIAdb!", "Viva le Docker!!", $(CLS), )
+	docker build \
+		-t maria:test \
+		folder/maria/.
+	docker run -d -it \
+		--name maria_test \
+		-p 3306:3306 \
+		--env-file srcs/.env \
+		-v $$(pwd)/secrets/db_root_password.txt:/run/secrets/db_root_password:ro \
+		-v $$(pwd)/secrets/db_password.txt:/run/secrets/db_password:ro \
+		--rm \
+		maria:test
+	
+
+wordpress:
+	@$(call random_shmol_cat, "TESHTING: ... WORDPRESS!", "Viva le Docker!!", $(CLS), )
+	docker build \
+		-t wordpress:test \
+		folder/wordpress/.
+	docker run -d -it \
+		--name wordpress_test \
+		--rm \
+		wordpress:test
 
 # ╭──────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
 # │─██████████████─██████████████─██████──██████─████████████████───██████████████─██████████████─██████████████─│

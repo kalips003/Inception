@@ -1,18 +1,16 @@
 
 FROM debian:bullseye
 
-RUN apt update && \
-    apt install -y --no-install-recommends nginx && \
-    apt clean && \
-    rm -rf /var/lib/apt/lists/*
+RUN apt update \
+	&& apt install -y --no-install-recommends nginx openssl \
+	&& apt clean \
+	&& rm -rf /var/lib/apt/lists/*
 
-# copy conf file
-COPY nginx.conf /etc/nginx/nginx.conf
-# ssl public / private key
-COPY ssl/nginx-selfsigned.key /etc/nginx/ssl/nginx-selfsigned.key
-COPY ssl/nginx.crt /etc/nginx/ssl/nginx.crt
-# make private key not readable
-RUN chmod 600 /etc/nginx/ssl/nginx-selfsigned.key
+# self-generated ssl public / private key + create default.conf
+COPY ssl/generate_ssl.sh /tmp/generate_ssl.sh
+RUN chmod +x /tmp/generate_ssl.sh \
+	&& /tmp/generate_ssl.sh \
+	&& rm -f /tmp/generate_ssl.sh
 
 EXPOSE 80
 

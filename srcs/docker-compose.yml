@@ -25,7 +25,8 @@ services:
     build:
       context: ./requirements/wordpress/.
     depends_on:
-      - mariadb
+      mariadb:
+        condition: service_healthy
     volumes:
       - wordpress:/var/www/html
     networks:
@@ -47,40 +48,24 @@ services:
     env_file:
       - .env
     restart: always
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-u", "root", "-p$MYSQL_ROOT_PASSWORD"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
 
-
-
-
-
-#     secrets:
-#       - db_password
-
-# depends_on:
-#   mariadb:
-#     condition: service_healthy
-#   helthcheck:?
 # =========================================================
 volumes:
   wordpress:
-    name: wordpress
-    driver: local
-    driver_opts:
-      device:
-      o:
-      type:
+    name: wordpress_data
   mariadb:
-    name: mariadb
-    driver: local
-    driver_opts:
-      device:
-      o:
-      type:
+    name: mariadb_data
 
 
 # =========================================================
 networks:
   inception:
-    name: inception
+    name: inception_net
   
 
 # =========================================================

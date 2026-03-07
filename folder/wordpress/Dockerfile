@@ -24,4 +24,4 @@ RUN rm -rf * \
 EXPOSE 9000
 EXPOSE 3306
 
-CMD ["/usr/sbin/php-fpm7.4", "-F"]
+CMD ["bash"]
