@@ -1,7 +1,11 @@
 #!/bin/bash
 
-export NGINX_SSL_PRIVATE=/etc/ssl/private/nginx.key
-export NGINX_SSL_PUBLIC=/etc/ssl/certs/nginx.crt
+# export NGINX_SSL_PRIVATE=/etc/ssl/private/nginx.key
+# export NGINX_SSL_PUBLIC=/etc/ssl/certs/nginx.crt
+# export DOMAIN_NAME=agallon.42.fr
+set -o allexport
+source /tmp/.env
+set +o allexport
 
 openssl req -x509 -nodes -days 365 \
     -newkey rsa:2048 \
@@ -9,9 +13,13 @@ openssl req -x509 -nodes -days 365 \
     -out $NGINX_SSL_PUBLIC \
     -subj "/C=FR/L=Paris/O=42/OU=student/CN=$DOMAIN_NAME"
 
+echo -e $C_430 "-0-----------------------\n" $RESET
+cat /tmp/.env
+
 echo -e $C_430 "-1-----------------------\n" $RESET \
 	"NGINX_SSL_PRIVATE=$NGINX_SSL_PRIVATE\n" \
 	"NGINX_SSL_PUBLIC=$NGINX_SSL_PUBLIC\n" \
+	"DOMAIN_NAME=$DOMAIN_NAME\n" \
 	$C_430 "-2-----------------------\n" $RESET >> /var/output
 
 # make private key not readable
@@ -75,19 +83,20 @@ echo '
 	location ~ [^/]\.php(/|$) {
 		try_files $uri =404;
 		include fastcgi_params; 
-		fastcgi_pass wordpress:9000; 
+		fastcgi_pass wordpress:9000;
 		fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+
 	}
 
 }
-
-server {
-	listen 80;
-	listen [::]:80;
-	return 301 https://$host$request_uri;
-}
-
 ' >> /etc/nginx/conf.d/default.conf
+
+
+# server {
+# 	listen 80;
+# 	listen [::]:80;
+# 	return 301 https://$host$request_uri;
+# }
 
 
 echo -e $C_153 "-3-----------------------\n" >> /var/output

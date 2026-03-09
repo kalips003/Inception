@@ -34,7 +34,8 @@ b:
 	-make down
 	-make a
 	docker exec -it nginx \
-		mysql -u root -p$$(cat /run/secrets/db_root_password)
+		bash -c "cat /var/output"
+# 		mysql -u root -p$$(cat /run/secrets/db_root_password)
 
 c:
 	@$(call random_shmol_cat, "TESHTING: ... $(NAME)!", "Viva le Docker!!", $(CLS), )

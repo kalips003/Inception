@@ -8,7 +8,9 @@ set +a
 
 
 echo -e $C_430 "--- script_wp_setup.sh ---" $RESET
+echo -e $C_104 "WP_ADMIN_USR=$WP_ADMIN_USR" $RESET
 echo -e $C_104 "WP_ADMIN_PWD=$WP_ADMIN_PWD" $RESET
+echo -e $C_104 "WP_USR=$WP_USR" $RESET
 echo -e $C_104 "WP_USR_PWD=$WP_USR_PWD" $RESET
 echo -e $C_430 "-------------------------" $RESET
 
@@ -23,7 +25,10 @@ if ! wp core is-installed --allow-root >/dev/null 2>&1; then
 	--skip-email \
 	--allow-root
 	chown -R www-data:www-data /var/www/html
+	echo -e $C_430 "-0--wp core installed---------------------" $RESET
 fi
+echo -e $C_104 "WP_ADMIN_USR=$WP_ADMIN_USR" $RESET
+echo -e $C_104 "WP_ADMIN_PWD=$WP_ADMIN_PWD" $RESET
 echo -e $C_430 "-1-----------------------" $RESET
 
 # Create subscriber user only if it doesn't exist
