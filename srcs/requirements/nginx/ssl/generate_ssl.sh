@@ -1,10 +1,18 @@
 #!/bin/bash
 
+export NGINX_SSL_PRIVATE=/etc/ssl/private/nginx.key
+export NGINX_SSL_PUBLIC=/etc/ssl/certs/nginx.crt
+
 openssl req -x509 -nodes -days 365 \
     -newkey rsa:2048 \
     -keyout $NGINX_SSL_PRIVATE \
     -out $NGINX_SSL_PUBLIC \
     -subj "/C=FR/L=Paris/O=42/OU=student/CN=$DOMAIN_NAME"
+
+echo -e $C_430 "-1-----------------------\n" $RESET \
+	"NGINX_SSL_PRIVATE=$NGINX_SSL_PRIVATE\n" \
+	"NGINX_SSL_PUBLIC=$NGINX_SSL_PUBLIC\n" \
+	$C_430 "-2-----------------------\n" $RESET >> /var/output
 
 # make private key not readable
 chmod 600 $NGINX_SSL_PRIVATE
@@ -46,59 +54,42 @@ chmod 600 $NGINX_SSL_PRIVATE
 # You can replace with your domain for production, e.g. CN=www.agallon.fr
 
 echo "
-user www-data;
-worker_processes auto; 
-pid /run/nginx.pid;
-
-events {
-	worker_connections 768; 
-	
-}
-
-http {
-
-	sendfile on; 
-	tcp_nopush on; 
-	types_hash_max_size 2048; 
-	
-	include /etc/nginx/mime.types; 
-	default_type application/octet-stream; 
-
+server {
 	ssl_protocols TLSv1.2 TLSv1.3; 
+	listen 443 ssl;
+	listen [::]:443 ssl; 
+
+	ssl_certificate $NGINX_SSL_PUBLIC;
+	ssl_certificate_key $NGINX_SSL_PRIVATE;
 	
-	access_log /var/log/nginx/access.log;
-	error_log /var/log/nginx/error.log;
-
-	server {
-		listen 443 ssl;
-		listen [::]:443 ssl; 
-
-		ssl_certificate $NGINX_SSL_PUBLIC;
-		ssl_certificate_key $NGINX_SSL_PRIVATE;
-		
-		server_name $DOMAIN_NAME www.$DOMAIN_NAME;" > /etc/nginx/conf.d/default.conf
+	server_name $DOMAIN_NAME www.$DOMAIN_NAME;" > /etc/nginx/conf.d/default.conf
 
 echo '
-		root /var/www/html;
-		index index.php;
+	root /var/www/html;
+	index index.php;
 
-		location / {
-			try_files $uri $uri/ /index.php?$args; 
-		}
-
-		location ~ [^/]\.php(/|$) {
-			try_files $uri =404;
-			include fastcgi_params; 
-			fastcgi_pass wordpress:9000; 
-			fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-		}
-
+	location / {
+		try_files $uri $uri/ /index.php?$args; 
 	}
 
-	server {
-		listen 80;
-		listen [::]:80;
-		return 301 https://$host$request_uri;
+	location ~ [^/]\.php(/|$) {
+		try_files $uri =404;
+		include fastcgi_params; 
+		fastcgi_pass wordpress:9000; 
+		fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
 	}
+
 }
+
+server {
+	listen 80;
+	listen [::]:80;
+	return 301 https://$host$request_uri;
+}
+
 ' >> /etc/nginx/conf.d/default.conf
+
+
+echo -e $C_153 "-3-----------------------\n" >> /var/output
+cat /etc/nginx/conf.d/default.conf >> /var/output
+echo -e "\n-4-----------------------\n" $RESET >> /var/output

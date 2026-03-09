@@ -27,16 +27,30 @@ all: $(NAME)
 # docker compose up --abort-on-container-exit
 a:
 	@$(call random_shmol_cat, "TESHTING: ... $(NAME)!", "Viva le Docker!!", $(CLS), )
-	-docker compose -f srcs/docker-compose.yml -p $(NAME) up --build -d
+	-docker compose -f srcs/docker-compose.yml up --build -d
 
-down : 
-	docker-compose -f ./srcs/docker-compose.yml down -v
+b:
+	@$(call random_shmol_cat, "TESHTING: ... $(NAME)!", "Viva le Docker!!", $(CLS), )
+	-make down
+	-make a
+	docker exec -it nginx \
+		mysql -u root -p$$(cat /run/secrets/db_root_password)
+
+c:
+	@$(call random_shmol_cat, "TESHTING: ... $(NAME)!", "Viva le Docker!!", $(CLS), )
+	-make down
+	docker build -t testnginx srcs/requirements/nginx
+	docker run --rm -it --env-file ./srcs/.env --entrypoint bash testnginx -c \
+		"cat -e  /var/output"
+
+down : clean
+	docker compose -f srcs/docker-compose.yml down -v
 
 stop : 
-	docker-compose -f ./srcs/docker-compose.yml stop
+	docker compose -f srcs/docker-compose.yml stop
 
 start : 
-	docker-compose -f ./srcs/docker-compose.yml start
+	docker compose -f srcs/docker-compose.yml start
 
 NAME2 = bash:1.0
 t:
@@ -57,7 +71,11 @@ maria:
 		-v $$(pwd)/secrets/db_password.txt:/run/secrets/db_password:ro \
 		--rm \
 		maria:test
-	
+
+maria_connect:
+	@$(call random_shmol_cat, "hello? ... MARIAdb?", "Viva le Docker!!", $(CLS), )
+	docker exec -it mariadb \
+		mysql -u root -p$$(cat /run/secrets/db_root_password)
 
 wordpress:
 	@$(call random_shmol_cat, "TESHTING: ... WORDPRESS!", "Viva le Docker!!", $(CLS), )
@@ -68,6 +86,24 @@ wordpress:
 		--name wordpress_test \
 		--rm \
 		wordpress:test
+
+# --------------------------------------------------------------------------------- >
+# 																				CLEAN
+clean:
+	@$(call print_cat, $(CLEAR), $(C_225), $(C_320), $(C_450), $(call pad_word, 10, "Objects"), $(call pad_word, 12, "Exterminated"));
+	-docker rm -f $$(docker ps -aq)
+	-docker volume -y rm $$(docker volume ls -q)
+	-docker volume -y prune
+	-docker network -y rm $$(docker network ls -q --filter type=custom)
+
+
+
+fclean: clean
+	@rm -rf $(NAME)
+	@$(call print_cat, $(CLEAR), $(C_120), $(C_300), $(C_210), $(call pad_word, 10, "All⠀clean"), $(call pad_word, 12, "Miaster"));
+	docker compose -f srcs/docker-compose.yml down -v --remove-orphans
+	docker system prune -af
+	docker volume prune -af
 
 # ╭──────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
 # │─██████████████─██████████████─██████──██████─████████████████───██████████████─██████████████─██████████████─│
@@ -92,9 +128,9 @@ FLAGS_LESS = -g -std=c++98
 OBJ_FOLDER0 = _obj
 OBJ_FOLDER = src/$(OBJ_FOLDER0)
 
-SRC := $(shell find src -name '*.cpp')
-OBJ := $(SRC:src/%.cpp=src/$(OBJ_FOLDER0)/%.o)
-HEAD = $(shell find src -name '*.hpp') $(shell find inc -name '*.hpp')
+# SRC := $(shell find src -name '*.cpp')
+# OBJ := $(SRC:src/%.cpp=src/$(OBJ_FOLDER0)/%.o)
+# HEAD = $(shell find src -name '*.hpp') $(shell find inc -name '*.hpp')
 
 FOLDERS_HEADERS := $(wildcard src/*/ src/*/*/ src/*/*/*/)
 FOLDERS_INCLUDE := $(addprefix -I, $(FOLDERS_HEADERS))
@@ -252,18 +288,6 @@ git3: fclean
 
 # --------------------------------------------------------------------------------- >
 # 																				CLEAN
-clean:
-	@rm -rf $(OBJ_FOLDER)
-	@$(call print_cat, $(CLEAR), $(C_225), $(C_320), $(C_450), $(call pad_word, 10, "Objects"), $(call pad_word, 12, "Exterminated"));
-
-clean_silent:
-	@clear
-	@rm -rf $(NAME)
-	@rm -rf $(OBJ_FOLDER)
-
-fclean: clean
-	@rm -rf $(NAME)
-	@$(call print_cat, $(CLEAR), $(C_120), $(C_300), $(C_210), $(call pad_word, 10, "All⠀clean"), $(call pad_word, 12, "Miaster"));
 
 re: fclean all
 

@@ -23,20 +23,18 @@ RUN rm -rf * \
     && rm -f latest.tar.gz \
     && chown -R www-data:www-data /var/www/html
 
-# create the wp-config.php
+COPY entry.sh /tmp/entry.sh
 COPY script_wp_conf.sh /tmp/script_wp_conf.sh
-RUN chmod -R 755 /tmp/script_wp_conf.sh \
-    && /tmp/script_wp_conf.sh \
-    && rm -f /tmp/script_wp_conf.sh
-# initialize the wordpress
 COPY script_wp_setup.sh /tmp/script_wp_setup.sh
-RUN chmod -R 755 /tmp/script_wp_setup.sh \
-    && /tmp/script_wp_setup.sh \
-    && rm -f /tmp/script_wp_setup.sh
-
-RUN sed -i 's/listen = \/run\/php\/php7.3-fpm.sock/listen = 9000/g' /etc/php/7.3/fpm/pool.d/www.conf \
-    && mkdir /run/php
+RUN sed -i 's/listen = \/run\/php\/php7.4-fpm.sock/listen = 9000/g' /etc/php/7.4/fpm/pool.d/www.conf \
+    && mkdir /run/php \
+	&& chmod -R 755 /tmp/script_wp_conf.sh \
+    && chmod -R 755 /tmp/entry.sh \
+    && chmod -R 755 /tmp/script_wp_setup.sh \
+    && curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar \
+    && chmod +x wp-cli.phar \
+    && mv wp-cli.phar /usr/local/bin/wp
 
 EXPOSE 9000
 
-CMD ["/usr/sbin/php-fpm7.4", "-F"]
+CMD ["/tmp/entry.sh"]

@@ -2,6 +2,14 @@
 Tables have columns (fields) and rows (records).
 */
 
+SHOW DATABASES;
+USE database_name;
+SHOW TABLES;
+DESCRIBE table_name;
+SHOW COLUMNS FROM table_name;
+SELECT User, Host FROM mysql.user;
+SELECT * FROM mysql.user;
+
 ----------------------------------------------------------------
 -- 				Database / User Management 					  --
 ----------------------------------------------------------------
