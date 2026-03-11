@@ -33,6 +33,5 @@ if [ ! -f wp-config.php ]; then
 	chown www-data:www-data wp-config.php
 	chmod 640 wp-config.php
 	
-	echo "\$_SERVER['HTTPS'] = 'on';" >> wp-config.php
-	echo "define('FORCE_SSL_ADMIN', true);" >> wp-config.php
+	sed -i "s|require_once ABSPATH . 'wp-settings.php';|\$_SERVER['HTTPS'] = 'on';\ndefine('FORCE_SSL_ADMIN', true);\nrequire_once ABSPATH . 'wp-settings.php';|" wp-config.php
 fi
