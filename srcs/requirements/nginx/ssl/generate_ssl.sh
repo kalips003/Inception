@@ -70,7 +70,7 @@ server {
 	ssl_certificate $NGINX_SSL_PUBLIC;
 	ssl_certificate_key $NGINX_SSL_PRIVATE;
 	
-	server_name $DOMAIN_NAME www.$DOMAIN_NAME;" > /etc/nginx/conf.d/default.conf
+	server_name $DOMAIN_NAME;" > /etc/nginx/conf.d/default.conf
 
 echo '
 	root /var/www/html;

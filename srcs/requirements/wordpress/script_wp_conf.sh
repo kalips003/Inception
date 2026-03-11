@@ -32,5 +32,7 @@ if [ ! -f wp-config.php ]; then
 	echo "define( 'WP_ALLOW_REPAIR', true );" >> wp-config.php
 	chown www-data:www-data wp-config.php
 	chmod 640 wp-config.php
-
+	
+	echo "\$_SERVER['HTTPS'] = 'on';" >> wp-config.php
+	echo "define('FORCE_SSL_ADMIN', true);" >> wp-config.php
 fi
