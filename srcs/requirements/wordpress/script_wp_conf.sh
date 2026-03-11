@@ -27,11 +27,24 @@ if [ ! -f wp-config.php ]; then
 	# set WP keys/salts dynamically
 	# Remove the placeholder lines
 	sed -i "/define( 'AUTH_KEY'/,/define( 'NONCE_SALT'/d" wp-config.php
-	# Append the generated keys from WordPress API
-	curl -s https://api.wordpress.org/secret-key/1.1/salt/ >> wp-config.php
+	# Fetch salts from WordPress API and insert BEFORE require_once wp-settings.php
+	# (salts must be defined before wp-settings.php loads so wp_salt() uses them
+	#  instead of falling back to DB values, preventing HMAC mismatches on auth)
+	curl -s https://api.wordpress.org/secret-key/1.1/salt/ > /tmp/wp_salts.php
+	php -r "
+\$config = file_get_contents('wp-config.php');
+\$salts  = file_get_contents('/tmp/wp_salts.php');
+\$insert = \$salts
+        . \"\\\$_SERVER['HTTPS'] = 'on';\n\"
+        . \"define('FORCE_SSL_ADMIN', true);\n\";
+\$config = str_replace(
+    \"require_once ABSPATH . 'wp-settings.php';\",
+    \$insert . \"require_once ABSPATH . 'wp-settings.php';\",
+    \$config
+);
+file_put_contents('wp-config.php', \$config);
+"
 	echo "define( 'WP_ALLOW_REPAIR', true );" >> wp-config.php
 	chown www-data:www-data wp-config.php
 	chmod 640 wp-config.php
-	
-	sed -i "s|require_once ABSPATH . 'wp-settings.php';|\$_SERVER['HTTPS'] = 'on';\ndefine('FORCE_SSL_ADMIN', true);\nrequire_once ABSPATH . 'wp-settings.php';|" wp-config.php
 fi
