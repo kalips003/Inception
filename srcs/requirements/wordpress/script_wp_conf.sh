@@ -1,5 +1,4 @@
 #!/bin/bash
-echo -e $C_430 "WE ARE IN" $RESET
 
 set -e  # stop script if any command fails
 
@@ -9,7 +8,7 @@ if [ ! -f wp-config.php ]; then
 	export DB_USER=$(echo $MYSQL_USER)
 	DB_PWD=$(cat /run/secrets/db_password)
 
-	echo -e $C_430 "--- script_wp_conf.sh ---" $RESET
+	echo -e $C_430 "-0-- script_wp_conf.sh ---" $RESET
 	echo -e $C_104 "DB_NAME=$DB_NAME" $RESET
 	echo -e $C_104 "DB_USER=$DB_USER" $RESET
 	echo -e $C_104 "DB_PWD=$DB_PWD" $RESET
@@ -34,11 +33,11 @@ if [ ! -f wp-config.php ]; then
 	#  instead of falling back to DB values, preventing HMAC mismatches on auth)
 	# Append the generated keys from WordPress API
 	curl -s https://api.wordpress.org/secret-key/1.1/salt/ >> wp-config.php
-	echo "define( 'WP_ALLOW_REPAIR', true );" >> wp-config.php
 	
 	echo "\$_SERVER['HTTPS'] = 'on';" >> wp-config.php
 	echo "define('FORCE_SSL_ADMIN', true);" >> wp-config.php
 	echo "define( 'WP_ALLOW_REPAIR', true );" >> wp-config.php
+
 	echo "require_once ABSPATH . 'wp-settings.php';" >> wp-config.php
 
 	chown www-data:www-data wp-config.php

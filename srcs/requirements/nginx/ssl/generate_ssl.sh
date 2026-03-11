@@ -3,6 +3,10 @@
 # export NGINX_SSL_PRIVATE=/etc/ssl/private/nginx.key
 # export NGINX_SSL_PUBLIC=/etc/ssl/certs/nginx.crt
 # export DOMAIN_NAME=agallon.42.fr
+export C_501="\033[38;5;197m"
+export C_430="\033[38;5;178m"
+export C_153="\033[38;5;85m"
+
 set -o allexport
 source /tmp/.env
 set +o allexport
@@ -13,9 +17,9 @@ openssl req -x509 -nodes -days 365 \
     -out $NGINX_SSL_PUBLIC \
     -subj "/C=FR/L=Paris/O=42/OU=student/CN=$DOMAIN_NAME"
 
+echo -e $C_501 "--- IN NGINX ---" $RESET
 echo -e $C_430 "-0-----------------------\n" $RESET
 cat /tmp/.env
-
 echo -e $C_430 "-1-----------------------\n" $RESET \
 	"NGINX_SSL_PRIVATE=$NGINX_SSL_PRIVATE\n" \
 	"NGINX_SSL_PUBLIC=$NGINX_SSL_PUBLIC\n" \
@@ -92,14 +96,6 @@ echo '
 }
 ' >> /etc/nginx/conf.d/default.conf
 
-
-# server {
-# 	listen 80;
-# 	listen [::]:80;
-# 	return 301 https://$host$request_uri;
-# }
-
-
-echo -e $C_153 "-3-----------------------\n" >> /var/output
+echo -e $C_153 "-3: /etc/nginx/conf.d/default.conf -----------------------\n" >> /var/output
 cat /etc/nginx/conf.d/default.conf >> /var/output
 echo -e "\n-4-----------------------\n" $RESET >> /var/output

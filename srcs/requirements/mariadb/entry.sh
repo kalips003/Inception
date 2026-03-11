@@ -23,38 +23,30 @@ FLUSH PRIVILEGES;
 EOF
 
 echo -e $C_501 "--- IN MARIA ---" $RESET
-echo -e $C_104 "MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD" $RESET
-echo -e $C_104 "MYSQL_PASSWORD=$MYSQL_PASSWORD" $RESET
-echo -e $C_104 "MYSQL_USER=$MYSQL_USER" $RESET
 echo -e $C_104 "MYSQL_DATABASE=$MYSQL_DATABASE" $RESET
+echo -e $C_104 "MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD" $RESET
+echo -e $C_104 "MYSQL_USER=$MYSQL_USER" $RESET
+echo -e $C_104 "MYSQL_PASSWORD=$MYSQL_PASSWORD" $RESET
 echo -e $C_501 "-------------------------" $RESET
+echo -e $C_501 "-$SQL_FILE_PATH: ---------------"
+cat $SQL_FILE_PATH
+echo -e "-------------------------" $RESET
 
 mysqld_safe &
 
 # wait until MySQL is ready
 until mysqladmin ping >/dev/null 2>&1; do
-	echo "Waiting for MariaDB to start..."
+	echo -e $C_151 "Waiting for MariaDB to start..." $RESET
 	sleep 1
 done
 
 if ! mysql -u root -p"$MYSQL_ROOT_PASSWORD" -e "USE wordpress;" >/dev/null 2>&1; then
-	echo -e $C_501 "First run: initializing MariaDB" $RESET
+	echo -e $C_151 "First run: initializing MariaDB" $RESET
 	mysql -u root < $SQL_FILE_PATH
 else
-	echo -e $C_501 "ALREADY setup" $RESET
+	echo -e $C_151 "ALREADY setup" $RESET
 fi
-# echo -e $C_531 "-BEFORE------------------" $RESET
-# killall mariadbd 
-# echo -e $C_531 "-AFTER------------------" $RESET
-
-echo -e $C_531 "---- PROCESS LIST BEFORE KILL ----" $RESET
-ps aux | grep -E "maria|mysql" | grep -v grep
 
 killall mariadbd
-# killall mysqld
-# killall mysqld_safe
-
-echo -e $C_531 "---- PROCESS LIST AFTER KILL ----" $RESET
-ps aux | grep -E "maria|mysql" | grep -v grep
 
 exec mysqld --user=mysql --console
