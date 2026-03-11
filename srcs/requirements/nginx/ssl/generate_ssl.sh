@@ -6,6 +6,7 @@
 export C_501="\033[38;5;197m"
 export C_430="\033[38;5;178m"
 export C_153="\033[38;5;85m"
+export RESET="\033[0m"
 
 set -o allexport
 source /tmp/.env

@@ -33,16 +33,6 @@ b:
 	@$(call random_shmol_cat, "TESHTING: ... $(NAME)!", "Viva le Docker!!", $(CLS), )
 	-make down
 	-make a
-	docker exec -it nginx \
-		bash -c "cat /var/output"
-# 		mysql -u root -p$$(cat /run/secrets/db_root_password)
-
-c:
-	@$(call random_shmol_cat, "TESHTING: ... $(NAME)!", "Viva le Docker!!", $(CLS), )
-	-make down
-	docker build -t testnginx srcs/requirements/nginx
-	docker run --rm -it --env-file ./srcs/.env --entrypoint bash testnginx -c \
-		"cat -e  /var/output"
 
 down : clean
 	docker compose -f srcs/docker-compose.yml down -v
@@ -53,6 +43,7 @@ stop :
 start : 
 	docker compose -f srcs/docker-compose.yml start
 
+
 NAME2 = bash:1.0
 t:
 	@$(call random_shmol_cat, "TESHTING: ... $(NAME)!", "Viva le Docker!!", $(CLS), )
@@ -60,33 +51,20 @@ t:
 	docker run -it --name bashtest $(NAME2)
 
 maria:
-	@$(call random_shmol_cat, "TESHTING: ... MARIAdb!", "Viva le Docker!!", $(CLS), )
-	docker build \
-		-t maria:test \
-		folder/maria/.
-	docker run -d -it \
-		--name maria_test \
-		-p 3306:3306 \
-		--env-file srcs/.env \
-		-v $$(pwd)/secrets/db_root_password.txt:/run/secrets/db_root_password:ro \
-		-v $$(pwd)/secrets/db_password.txt:/run/secrets/db_password:ro \
-		--rm \
-		maria:test
+	@$(call random_shmol_cat, "Entering: ... MARIAdb!", "Viva le Docker!!", $(CLS), )
+	docker exec -it mariadb bash
 
-maria_connect:
-	@$(call random_shmol_cat, "hello? ... MARIAdb?", "Viva le Docker!!", $(CLS), )
-	docker exec -it mariadb \
-		mysql -u root -p$$(cat /run/secrets/db_root_password)
+maria2:
+	@$(call random_shmol_cat, "Entering: ... MARIAdb!", "Viva le Docker!!", $(CLS), )
+	docker exec -it mariadb bash -c 'mysql -u root -p$$(cat /run/secrets/db_root_password)'
 
 wordpress:
-	@$(call random_shmol_cat, "TESHTING: ... WORDPRESS!", "Viva le Docker!!", $(CLS), )
-	docker build \
-		-t wordpress:test \
-		folder/wordpress/.
-	docker run -d -it \
-		--name wordpress_test \
-		--rm \
-		wordpress:test
+	@$(call random_shmol_cat, "Entering: ... WORDPRESS!", "Viva le Docker!!", $(CLS), )
+	docker exec -it wordpress bash
+
+nginx:
+	@$(call random_shmol_cat, "Entering: ... NGINX!", "Viva le Docker!!", $(CLS), )
+	docker exec -it nginx bash
 
 # --------------------------------------------------------------------------------- >
 # 																				CLEAN

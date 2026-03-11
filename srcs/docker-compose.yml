@@ -34,7 +34,7 @@ services:
       - inception
     env_file:
       - .env
-    restart: no
+    restart: on-failure
     healthcheck:
       test: ["CMD-SHELL", "echo > /dev/tcp/localhost/9000 && echo OK || echo FAIL"]
       interval: 10s
@@ -57,7 +57,7 @@ services:
       - inception
     env_file:
       - .env
-    restart: no
+    restart: on-failure
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-u", "root", "-p$MYSQL_ROOT_PASSWORD"]
       interval: 5s
