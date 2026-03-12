@@ -1,6 +1,0 @@
-
-change ports on everything
-. move secrets
-. named volumes:
-    Both named volumes must store their data inside /home/login/data on the host
-    machine. Replace "login" with your learner’s username.

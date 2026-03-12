@@ -29,6 +29,7 @@ a:
 	@$(call random_shmol_cat, "TESHTING: ... $(NAME)!", "Viva le Docker!!", $(CLS), )
 	@mkdir -p /home/agallon/data/mariadb
 	@mkdir -p /home/agallon/data/wordpress
+	@chmod -R 777 /home/agallon/data
 	-docker compose -f srcs/docker-compose.yml up --build -d
 
 b:
@@ -86,6 +87,7 @@ fclean: clean
 	docker compose -f srcs/docker-compose.yml down -v --remove-orphans
 	docker system prune -af
 	docker volume prune -af
+	rm -rf /home/agallon/data
 
 # ╭──────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
 # │─██████████████─██████████████─██████──██████─████████████████───██████████████─██████████████─██████████████─│
