@@ -34,6 +34,9 @@ echo -e "-------------------------" $RESET
 
 mysqld_safe &
 
+echo -e $C_505 "-TRYING-----------------------" $RESET
+ls /var/lib/mysql
+
 # wait until MySQL is ready
 until mysqladmin ping >/dev/null 2>&1; do
 	echo -e $C_151 "Waiting for MariaDB to start..." $RESET

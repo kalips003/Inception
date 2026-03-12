@@ -2,6 +2,17 @@
 
 set -e  # stop script if any command fails
 
+# download wordpress archives
+if [ ! -f wp-config-sample.php ]; then
+    rm -rf *
+    curl -o latest.tar.gz https://wordpress.org/latest.tar.gz
+    tar -xzf latest.tar.gz --strip-components=1
+    rm -f latest.tar.gz
+    chown -R www-data:www-data /var/www/html
+else
+	echo -e $C_435 "wordpress already exist"
+fi
+
 if [ ! -f wp-config.php ]; then
 
 	export DB_NAME=$(echo $MYSQL_DATABASE)
@@ -14,6 +25,7 @@ if [ ! -f wp-config.php ]; then
 	echo -e $C_104 "DB_PWD=$DB_PWD" $RESET
 	echo -e $C_430 "-------------------------" $RESET
 
+	ls /var/www/html
 	cp wp-config-sample.php wp-config.php
 
 	# sed [options] 's/pattern/replacement/flags' file
@@ -42,5 +54,6 @@ if [ ! -f wp-config.php ]; then
 
 	chown www-data:www-data wp-config.php
 	chmod 640 wp-config.php
-
+else
+	echo -e $C_435 "wp-config.php already updated"
 fi

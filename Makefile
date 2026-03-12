@@ -27,6 +27,8 @@ all: $(NAME)
 # docker compose up --abort-on-container-exit
 a:
 	@$(call random_shmol_cat, "TESHTING: ... $(NAME)!", "Viva le Docker!!", $(CLS), )
+	@mkdir -p /home/agallon/data/mariadb
+	@mkdir -p /home/agallon/data/wordpress
 	-docker compose -f srcs/docker-compose.yml up --build -d
 
 b:
@@ -73,6 +75,7 @@ clean:
 	-docker rm -f $$(docker ps -aq)
 	-docker volume -y rm $$(docker volume ls -q)
 	-docker volume -y prune
+	-rm -rf /home/agallon/data
 	-docker network -y rm $$(docker network ls -q --filter type=custom)
 
 

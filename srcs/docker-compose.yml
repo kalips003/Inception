@@ -72,17 +72,17 @@ volumes:
   wordpress:
     name: wordpress_data
     driver: local
-    # driver_opts:
-    #         device: /Users/agallon/Desktop/Inception/srcs/wordpress
-    #         o: bind
-    #         type: none
+    driver_opts:
+            device: /home/agallon/data/wordpress
+            o: bind
+            type: none
   mariadb:
     name: mariadb_data
     driver: local
-    # driver_opts:
-    #         device: /Users/agallon/Desktop/Inception/srcs/mariadb
-    #         o: bind
-    #         type: none
+    driver_opts:
+            device: /home/agallon/data/mariadb
+            o: bind
+            type: none
 
 
 # =========================================================
