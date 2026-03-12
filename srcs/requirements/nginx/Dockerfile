@@ -14,7 +14,7 @@ RUN chmod +x /tmp/generate_ssl.sh \
     && /tmp/generate_ssl.sh \
     && rm -f /tmp/generate_ssl.sh
 
-EXPOSE 80
+EXPOSE 443
 
 # CMD ["nginx", "-g", "daemon off;"]
 CMD ["sh", "-c", "cat /var/output && nginx -g 'daemon off;'"]

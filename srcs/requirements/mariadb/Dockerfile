@@ -14,6 +14,6 @@ COPY 50-server.cnf /etc/mysql/mariadb.conf.d/50-server.cnf
 COPY entry.sh /tmp/entry.sh
 RUN chmod +x /tmp/entry.sh
 
-EXPOSE 12345
+EXPOSE 3306
 
 CMD ["/tmp/entry.sh"]

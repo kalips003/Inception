@@ -117,4 +117,4 @@ collation-server      = utf8mb4_general_ci
 [mariadb-10.5]
 
 [mysqld]
-port = 12345
+port = 3306
