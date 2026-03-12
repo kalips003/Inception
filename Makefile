@@ -87,7 +87,6 @@ fclean: clean
 	docker compose -f srcs/docker-compose.yml down -v --remove-orphans
 	docker system prune -af
 	docker volume prune -af
-	rm -rf /home/agallon/data
 
 # ╭──────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
 # │─██████████████─██████████████─██████──██████─████████████████───██████████████─██████████████─██████████████─│
